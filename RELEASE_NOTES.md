@@ -1,1 +1,1 @@
-Fixes the crash on launch with JIT ("allocate ... for jit buffer: Operation not permitted"): QEMU now starts with split-wx=on. In StikDebug, use the legacy.js script.
+Fixes "failed to find romfile efi-virtio.rom": the app now includes QEMU's network and display ROMs from UTM, so LiberNT also gets a network card.

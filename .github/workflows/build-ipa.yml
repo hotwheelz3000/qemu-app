@@ -175,7 +175,7 @@ jobs:
             curl -fsSL -o utm-cache/UTM.ipa "https://github.com/utmapp/UTM/releases/download/$UTM_VERSION/UTM.ipa"
           fi
           rm -rf utm Payload
-          unzip -q utm-cache/UTM.ipa 'Payload/UTM.app/Frameworks/*' 'Payload/UTM.app/qemu/keymaps/*' -d utm
+          unzip -q utm-cache/UTM.ipa 'Payload/UTM.app/Frameworks/*' 'Payload/UTM.app/qemu/keymaps/*' 'Payload/UTM.app/qemu/efi-*' 'Payload/UTM.app/qemu/vgabios-*' -d utm
           if [ -f "xtool/$APP_NAME.ipa" ]; then
             unzip -q "xtool/$APP_NAME.ipa"
           else
@@ -203,6 +203,8 @@ jobs:
           ls "$app/Frameworks"
 
           cp -R utm/Payload/UTM.app/qemu/keymaps "$app/qemu/"
+          # Option ROMs for the network card (efi-virtio.rom) and display devices.
+          cp utm/Payload/UTM.app/qemu/efi-*.rom utm/Payload/UTM.app/qemu/vgabios-*.bin "$app/qemu/"
           gunzip -c Firmware/AAVMF_CODE.fd.gz > "$app/qemu/AAVMF_CODE.fd"
           gunzip -c Firmware/AAVMF_VARS.fd.gz > "$app/qemu/AAVMF_VARS.fd"
 
