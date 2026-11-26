@@ -95,7 +95,7 @@ struct SetupView: View {
                 .foregroundStyle(.tint)
             Text("LiberNT")
                 .font(.largeTitle.bold())
-            Text("LiberNT needs its disk (about 300 MB to download, 1 GB on your iPhone). It's saved in Files › On My iPhone › LiberNT.")
+            Text("LiberNT needs its disk (about 320 MB to download). It's saved in Files › On My iPhone › LiberNT.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
 

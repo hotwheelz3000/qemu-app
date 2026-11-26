@@ -1,1 +1,1 @@
-First build of LiberNT for iPhone: boots LiberNT (arm64) full screen in QEMU. Needs JIT from StikDebug with the UTM-Dolphin.js script.
+The disk now downloads as a ready-to-use qcow2 file (no unzipping on the phone), fixing "The disk download is incomplete".

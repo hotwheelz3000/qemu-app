@@ -1,0 +1,51 @@
+name: Publish LiberNT disk
+
+# Run by hand (Actions > Publish LiberNT disk > Run workflow). Downloads LiberNT's
+# arm64 preinstalled disk, converts it to a compressed qcow2, and publishes it as
+# the release the app downloads on first launch. The app reads qcow2 directly, so
+# nothing is unzipped on the phone.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  LIBERNT_TAG: nt10.0-043-2555-g8e478a22a1e
+  LIBERNT_ZIP: LiberNT-img-clang-arm64-Debug-target0xA00-8e478a22a1e.zip
+  DISK_TAG: disk-nt10.0-043-2555
+
+jobs:
+  disk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install qemu-img
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-utils
+
+      - name: Convert the disk
+        run: |
+          set -euo pipefail
+          curl -fsSL -o libernt.zip "https://github.com/LiberNT/LiberNT/releases/download/$LIBERNT_TAG/$LIBERNT_ZIP"
+          unzip -o libernt.zip
+          img=$(ls *.img | head -1)
+          qemu-img convert -f raw -O qcow2 -c "$img" LiberNT.qcow2
+          qemu-img check LiberNT.qcow2
+          ls -la LiberNT.qcow2
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$DISK_TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$DISK_TAG" LiberNT.qcow2 --clobber -R "$GITHUB_REPOSITORY"
+          else
+            gh release create "$DISK_TAG" LiberNT.qcow2 -R "$GITHUB_REPOSITORY" \
+              --title "LiberNT disk (nt10.0-043-2555, arm64)" \
+              --notes "Disk the app downloads on first launch: LiberNT's arm64 preinstalled disk ($LIBERNT_TAG), converted to qcow2." \
+              --latest=false
+          fi
+          echo "https://github.com/$GITHUB_REPOSITORY/releases/download/$DISK_TAG/LiberNT.qcow2"

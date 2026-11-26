@@ -8,7 +8,7 @@ Not affiliated with LiberNT, UTM, QEMU or Microsoft.
 
 - **Emulator:** QEMU (ARM64 `virt` machine), taken ready-made from [UTM](https://github.com/utmapp/UTM)'s iPhone app. The Build IPA workflow downloads UTM's IPA (version pinned as `UTM_VERSION` in the workflow) and copies `qemu-aarch64-softmmu.framework` and the frameworks it needs into this app. Nothing is compiled from QEMU's source.
 - **Firmware:** AAVMF / EDK2 UEFI for ARM64 (`Firmware/`, from Ubuntu's `qemu-efi-aarch64` 2024.02). UTM's own firmware doesn't show a picture with LiberNT.
-- **Disk:** on first launch the app downloads LiberNT's arm64 preinstalled disk (`LiberNT-img-clang-arm64-…zip`, build nt10.0-043-2555) and unzips it to `LiberNT.img`. You can use another disk instead (raw `.img` or `.qcow2`) with **Use a Disk from Files**.
+- **Disk:** on first launch the app downloads `LiberNT.qcow2` from this repo's `disk-nt10.0-043-2555` release. The **Publish LiberNT disk** workflow (run by hand) makes it from LiberNT's arm64 preinstalled disk (`LiberNT-img-clang-arm64-…zip`, build nt10.0-043-2555). QEMU reads qcow2 directly, so nothing is unzipped on the phone. You can use another disk instead (raw `.img` or `.qcow2`) with **Use a Disk from Files**.
 - **Hardware:** NVMe disk, ramfb screen, USB tablet and keyboard, UEFI settings saved in `efi-vars.fd`. Tested in QEMU: this setup boots to the LiberNT desktop. virtio-blk stops with error 0x7B, and virtio-gpu stays blank.
 - **Screen:** QEMU's VNC server on 127.0.0.1, read by a small VNC client in the app.
 
