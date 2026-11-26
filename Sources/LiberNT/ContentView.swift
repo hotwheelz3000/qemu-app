@@ -146,7 +146,7 @@ struct JITView: View {
                 Text("LiberNT runs in an emulator that needs JIT. Open it from StikDebug:")
                     .foregroundStyle(.secondary)
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("1. In StikDebug, assign the script **UTM-Dolphin.js** to LiberNT (the same script UTM uses).")
+                    Text("1. In StikDebug, assign the script **legacy.js** to LiberNT.")
                     Text("2. Launch LiberNT from StikDebug.")
                     Text("3. LiberNT starts by itself once JIT is on.")
                 }

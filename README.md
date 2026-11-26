@@ -17,7 +17,7 @@ Files live in **Files › On My iPhone › LiberNT**: the disk, `boot-log.txt` (
 ## Install and run
 
 1. Sign and install the IPA with Signulous. The app asks for the same memory entitlements as Andarium.
-2. In StikDebug, assign the script **UTM-Dolphin.js** to LiberNT. This QEMU asks for JIT memory the same way UTM does.
+2. In StikDebug, assign the script **legacy.js** to LiberNT. UTM's QEMU asks StikDebug for JIT memory with `brk #0x69`, which legacy.js handles (universal.js handles `brk #0xf00d`). QEMU runs with `split-wx=on`, which that needs on iOS 26 and later.
 3. Launch LiberNT from StikDebug. The first time, tap **Download LiberNT** and wait for it to unpack.
 
 ## Controls

@@ -40,7 +40,10 @@ enum QEMULauncher {
             "-cpu", "max",
             "-smp", "\(cores)",
             "-m", "\(ramMB)",
-            "-accel", "tcg,thread=multi,tb-size=256",
+            // split-wx=on: on iOS 26+ UTM's QEMU maps the JIT buffer read/write, then asks
+            // StikDebug (brk #0x69, legacy.js) for an executable copy. Without it QEMU
+            // tries MAP_JIT, which iOS refuses ("Operation not permitted").
+            "-accel", "tcg,thread=multi,tb-size=256,split-wx=on",
             "-drive", "if=pflash,format=raw,unit=0,readonly=on,file=\(code)",
             "-drive", "if=pflash,format=raw,unit=1,file=\(vars.path)",
             "-drive", "if=none,id=hd0,format=\(format),file=\(disk.path)",
