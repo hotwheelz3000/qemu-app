@@ -62,14 +62,14 @@ jobs:
       # (packages + compiled code), so later builds only recompile what changed.
       # The Xcode version is in the key, so a runner update starts a fresh cache.
       - name: Cache Homebrew downloads
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/Library/Caches/Homebrew
           key: brew-${{ runner.os }}-${{ hashFiles('.github/workflows/build-ipa.yml') }}
           restore-keys: brew-${{ runner.os }}-
 
       - name: Cache SwiftPM build
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             .build
@@ -160,7 +160,7 @@ jobs:
       # then ad-hoc signs it with LiberNT.entitlements so Signulous keeps the memory
       # entitlements when it re-signs.
       - name: Cache UTM download
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: utm-cache
           key: utm-${{ env.UTM_VERSION }}
