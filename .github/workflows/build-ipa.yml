@@ -155,8 +155,8 @@ jobs:
           fi
 
       # QEMU isn't compiled here: it comes ready-made from UTM's iPhone app (pinned
-      # version). This copies qemu-aarch64-softmmu.framework plus every framework it
-      # loads, the keyboard maps, and the UEFI firmware from Firmware/ into the app,
+      # version). This copies qemu-aarch64-softmmu and qemu-x86_64-softmmu plus every
+      # framework they load, the keyboard maps, and the UEFI firmware from Firmware/ into the app,
       # then ad-hoc signs it with LiberNT.entitlements so Signulous keeps the memory
       # entitlements when it re-signs.
       - name: Cache UTM download
@@ -175,7 +175,7 @@ jobs:
             curl -fsSL -o utm-cache/UTM.ipa "https://github.com/utmapp/UTM/releases/download/$UTM_VERSION/UTM.ipa"
           fi
           rm -rf utm Payload
-          unzip -q utm-cache/UTM.ipa 'Payload/UTM.app/Frameworks/*' 'Payload/UTM.app/qemu/keymaps/*' 'Payload/UTM.app/qemu/efi-*' 'Payload/UTM.app/qemu/vgabios-*' -d utm
+          unzip -q utm-cache/UTM.ipa 'Payload/UTM.app/Frameworks/*' 'Payload/UTM.app/qemu/*' -d utm
           if [ -f "xtool/$APP_NAME.ipa" ]; then
             unzip -q "xtool/$APP_NAME.ipa"
           else
@@ -199,12 +199,13 @@ jobs:
             done
           }
           copy_framework qemu-aarch64-softmmu
+          copy_framework qemu-x86_64-softmmu
           echo "Frameworks:"
           ls "$app/Frameworks"
 
-          cp -R utm/Payload/UTM.app/qemu/keymaps "$app/qemu/"
-          # Option ROMs for the network card (efi-virtio.rom) and display devices.
-          cp utm/Payload/UTM.app/qemu/efi-*.rom utm/Payload/UTM.app/qemu/vgabios-*.bin "$app/qemu/"
+          # QEMU's data folder from UTM (keymaps, SeaBIOS, option ROMs), minus UTM's
+          # large EDK2 images: the ARM64 machine uses the AAVMF firmware below.
+          rsync -a --exclude 'edk2-*' utm/Payload/UTM.app/qemu/ "$app/qemu/"
           gunzip -c Firmware/AAVMF_CODE.fd.gz > "$app/qemu/AAVMF_CODE.fd"
           gunzip -c Firmware/AAVMF_VARS.fd.gz > "$app/qemu/AAVMF_VARS.fd"
 

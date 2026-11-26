@@ -10,3 +10,4 @@ infoPath: LiberNT-Info.plist
 # Memory entitlements (same as Andarium). The workflow also ad-hoc signs the
 # unsigned app with this file so Signulous keeps them when it re-signs.
 entitlementsPath: LiberNT.entitlements
+iconPath: Resources/AppIcon.png

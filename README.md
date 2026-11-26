@@ -12,7 +12,16 @@ Not affiliated with LiberNT, UTM, QEMU or Microsoft.
 - **Hardware:** NVMe disk, ramfb screen, USB tablet and keyboard, virtio network card (QEMU's default, with UTM's ROMs), UEFI settings saved in `efi-vars.fd`. Tested in QEMU: this setup boots to the LiberNT desktop. virtio-blk stops with error 0x7B, and virtio-gpu stays blank.
 - **Screen:** QEMU's VNC server on 127.0.0.1, read by a small VNC client in the app.
 
-Files live in **Files › On My iPhone › LiberNT**: the disk, `boot-log.txt` (LiberNT's serial output) and `qemu-log.txt`.
+## Machines
+
+Settings › Machine switches between two computers (the app closes; open it again from StikDebug). Each has its own disk and CD drive.
+
+- **ARM64 (LiberNT):** the setup above. Also runs other ARM64 UEFI systems from a disk image (for example Debian's `nocloud` arm64 qcow2).
+- **x86 PC:** QEMU's i440FX PC with SeaBIOS, IDE disk and CD, standard VGA, USB tablet and an e1000 network card, using UTM's `qemu-x86_64-softmmu`. For ReactOS, Windows 95–XP, DOS and x86 Linux. First launch: pick an install ISO, make an empty (sparse) disk, and it boots from the CD.
+
+**CD drive:** Settings › CD Drive › Choose ISO. The ISO stays where it is in Files (the app keeps a bookmark to it). Inserting or ejecting while the machine runs takes effect right away. The machine boots from the CD when one is in.
+
+Files live in **Files › On My iPhone › LiberNT**: the disks (`LiberNT.img`, `PC.img`), `boot-log.txt` (LiberNT's serial output) and `qemu-log.txt`.
 
 ## Install and run
 

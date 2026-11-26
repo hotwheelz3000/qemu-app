@@ -6,8 +6,8 @@ enum VMFiles {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 
-    /// The disk. Raw or qcow2; QEMULauncher.diskFormat tells them apart.
-    static var disk: URL { folder.appendingPathComponent("LiberNT.img") }
+    /// The current machine's disk. Raw or qcow2; QEMULauncher.diskFormat tells them apart.
+    static var disk: URL { folder.appendingPathComponent(Machine.current.diskFileName) }
     static var vars: URL { folder.appendingPathComponent("efi-vars.fd") }
     static var serialLog: URL { folder.appendingPathComponent("boot-log.txt") }
     static var qemuLog: URL { folder.appendingPathComponent("qemu-log.txt") }
@@ -25,7 +25,19 @@ enum VMFiles {
 
     static func deleteDisk() {
         try? FileManager.default.removeItem(at: disk)
-        try? FileManager.default.removeItem(at: vars)
+        if Machine.current == .arm64 { try? FileManager.default.removeItem(at: vars) }
+    }
+
+    /// Makes an empty disk for installing a system from a CD. The file is sparse, so it
+    /// only takes space on the iPhone as the system writes to it.
+    static func createBlankDisk(gigabytes: Int) throws {
+        try? FileManager.default.removeItem(at: disk)
+        guard FileManager.default.createFile(atPath: disk.path, contents: nil) else {
+            throw DiskError.message("Couldn't create the disk")
+        }
+        let handle = try FileHandle(forWritingTo: disk)
+        defer { try? handle.close() }
+        try handle.truncate(atOffset: UInt64(gigabytes) << 30)
     }
 }
 
