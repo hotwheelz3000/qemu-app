@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MyApp",
+    name: "LiberNT",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
@@ -13,8 +13,8 @@ let package = Package(
         // An xtool project should contain exactly one library product,
         // representing the main app.
         .library(
-            name: "MyApp",
-            targets: ["MyApp"]
+            name: "LiberNT",
+            targets: ["LiberNT"]
         ),
     ],
     dependencies: [
@@ -24,7 +24,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MyApp",
+            name: "LiberNT",
             exclude: ["swiftgen.yml"],
             resources: [
                 .process("Resources"),
@@ -33,5 +33,7 @@ let package = Package(
                 .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
             ]
         ),
-    ]
+    ],
+    // QEMU and socket code is plain threads; keep Swift 5 checking.
+    swiftLanguageModes: [.v5]
 )

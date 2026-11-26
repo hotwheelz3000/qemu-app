@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MyAppApp: App {
+struct LiberNTApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

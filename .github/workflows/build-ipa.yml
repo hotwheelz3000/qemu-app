@@ -9,6 +9,8 @@ permissions:
   contents: write
 
 env:
+  # The UTM release QEMU is taken from.
+  UTM_VERSION: v5.0.8
   # Skip Homebrew's slow self-update on every run.
   HOMEBREW_NO_AUTO_UPDATE: "1"
   HOMEBREW_NO_INSTALL_CLEANUP: "1"
@@ -151,6 +153,69 @@ jobs:
             done
             exit 1
           fi
+
+      # QEMU isn't compiled here: it comes ready-made from UTM's iPhone app (pinned
+      # version). This copies qemu-aarch64-softmmu.framework plus every framework it
+      # loads, the keyboard maps, and the UEFI firmware from Firmware/ into the app,
+      # then ad-hoc signs it with LiberNT.entitlements so Signulous keeps the memory
+      # entitlements when it re-signs.
+      - name: Cache UTM download
+        uses: actions/cache@v5
+        with:
+          path: utm-cache
+          key: utm-${{ env.UTM_VERSION }}
+
+      - name: Add QEMU to the app
+        env:
+          APP_NAME: ${{ steps.app.outputs.name }}
+        run: |
+          set -euo pipefail
+          mkdir -p utm-cache
+          if [ ! -f utm-cache/UTM.ipa ]; then
+            curl -fsSL -o utm-cache/UTM.ipa "https://github.com/utmapp/UTM/releases/download/$UTM_VERSION/UTM.ipa"
+          fi
+          rm -rf utm Payload
+          unzip -q utm-cache/UTM.ipa 'Payload/UTM.app/Frameworks/*' 'Payload/UTM.app/qemu/keymaps/*' -d utm
+          if [ -f "xtool/$APP_NAME.ipa" ]; then
+            unzip -q "xtool/$APP_NAME.ipa"
+          else
+            mkdir Payload
+            cp -R "xtool/$APP_NAME.app" Payload/
+          fi
+          src=utm/Payload/UTM.app/Frameworks
+          app="Payload/$APP_NAME.app"
+          mkdir -p "$app/Frameworks" "$app/qemu"
+
+          copy_framework() {
+            local name=$1 dep
+            [ -d "$app/Frameworks/$name.framework" ] && return 0
+            if [ ! -d "$src/$name.framework" ]; then
+              echo "::error::UTM has no $name.framework"
+              exit 1
+            fi
+            cp -R "$src/$name.framework" "$app/Frameworks/"
+            for dep in $(otool -L "$src/$name.framework/$name" | awk '/@rpath\//{print $1}' | sed -E 's#@rpath/([^/]+)\.framework/.*#\1#'); do
+              copy_framework "$dep"
+            done
+          }
+          copy_framework qemu-aarch64-softmmu
+          echo "Frameworks:"
+          ls "$app/Frameworks"
+
+          cp -R utm/Payload/UTM.app/qemu/keymaps "$app/qemu/"
+          gunzip -c Firmware/AAVMF_CODE.fd.gz > "$app/qemu/AAVMF_CODE.fd"
+          gunzip -c Firmware/AAVMF_VARS.fd.gz > "$app/qemu/AAVMF_VARS.fd"
+
+          install_name_tool -add_rpath @executable_path/Frameworks "$app/$APP_NAME" 2>/dev/null || echo "rpath already set"
+          otool -l "$app/$APP_NAME" | grep -A2 LC_RPATH
+
+          find "$app/Frameworks" -maxdepth 1 -name '*.framework' -exec codesign -f -s - {} \;
+          codesign -f -s - --entitlements LiberNT.entitlements "$app"
+          codesign -d --entitlements - "$app"
+
+          rm -f "xtool/$APP_NAME.ipa"
+          zip -qry "xtool/$APP_NAME.ipa" Payload
+          du -sh "$app" "xtool/$APP_NAME.ipa"
 
       - name: Package IPA manually if needed
         env:

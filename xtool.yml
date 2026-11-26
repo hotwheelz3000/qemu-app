@@ -1,9 +1,12 @@
 version: 1
-bundleID: com.example.MyApp
+bundleID: com.hotwheelz3000.LiberNT
 # The SwiftPM product used as the app. Also names the built .app/.ipa.
 # Change it with ./rename-app.sh rather than by hand.
-product: MyApp
+product: LiberNT
 # Merged into the generated Info.plist. CFBundleShortVersionString here is the
 # app's version (change it by hand for a new version); the Build IPA workflow
 # sets CFBundleVersion to the build number automatically.
-infoPath: MyApp-Info.plist
+infoPath: LiberNT-Info.plist
+# Memory entitlements (same as Andarium). The workflow also ad-hoc signs the
+# unsigned app with this file so Signulous keeps them when it re-signs.
+entitlementsPath: LiberNT.entitlements
